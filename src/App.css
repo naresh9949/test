@@ -1,0 +1,41 @@
+table thead th {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+table tr td:first-child,
+table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+table tr td:nth-child(2),
+table th:nth-child(2) {
+  position: -webkit-sticky;
+
+  position: sticky;
+
+  left: 90px;
+  z-index: 3;
+
+  border-right: var(--border-size-s) solid var(--color-neutral-4);
+}
+
+table tr td:last-child {
+  border-right: none;
+}
+
+.phone table tr td,
+.tablet table tr td {
+  border-right: none;
+}
+
+img {
+  z-index: -9999;
+}
+
+/* button{
+  background-color: black;
+} */

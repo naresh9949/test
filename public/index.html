@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <script src="https://code.jquery.com/jquery-1.7.1.min.js" integrity="sha256-iBcUE/x23aI6syuqF7EeT/+JFBxjPs5zeFJEXxumwb0=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap CSS CDN Link -->
+
+    <!--Bootstrap JS CDN Link-->
+
+    <!--showing Spinner-->
+    <script>
+      function showSuccessAlert(msg, title, timeout) {
+        toastr.success(msg, title, { timeOut: timeout });
+      }
+
+      function showErrorAlert(msg, title, options) {
+        toastr.error(msg, title, options);
+      }
+      function showWarningAlert(msg, title, options) {
+        toastr.warning(msg, title, options);
+      }
+      function showSpinner() {
+        var spinner = $('<div id="priOverlaySpinner"></div>');
+        var spinCss = {
+          position: "absolute",
+          "z-index": "9999",
+          top: "50px",
+          left: "0",
+          width: "100%",
+          height: "100%",
+          "background-color": "rgba(0,0,0,0.1)",
+          "line-height": "200px",
+          "text-align": "center",
+          display: "none",
+        };
+        var spinnerMarkup =
+          '<div style="width: 50%;margin-top: 25%;margin-left: auto;margin-right: auto;">' +
+          '                   <img id="priSpinnerImg" /><span style="color:dodgerblue;"><strong>Loading..</strong></span></div>';
+        spinner.html(spinnerMarkup).css(spinCss);
+        $("body").append(spinner);
+        $("#priSpinnerImg").attr("src", "/Content/spinner.gif");
+        spinner.show();
+      }
+      function hideSpinner() {
+        $("#priOverlaySpinner").remove();
+      }
+    </script>
+
+    <!-- CSS stylesheet for info -->
+    <style>
+      .fieldHint {
+        border: 2px double red !important;
+      }
+
+      .fieldHint:hover {
+        background-color: lightblue !important;
+      }
+      .fieldHint .arrow:before {
+        border-top-color: #008ec3 !important;
+      }
+
+      .tooltip {
+        background-color: #008ec3;
+      }
+    </style>
+
+    <script>
+      var utils = {};
+
+      if (typeof serverErrorMsg != undefined)
+        serverErrorMsg = "Error contacting server";
+
+      function isFunc(f) {
+        return typeof f === "function";
+      }
+
+      function ajaxCall(url, data, method, doneCb, failCb) {
+        $.ajax({ url: url, data: data, type: method })
+          .done(function (data) {
+            if (isFunc(hideSpinner)) hideSpinner();
+            if (data && data.Error) return showErrorAlert(data.Message);
+            if (isFunc(doneCb)) return doneCb(data);
+          })
+          .fail(function (data) {
+            if (isFunc(hideSpinner)) hideSpinner();
+            if (typeof data !== "undefined" && typeof data === "string")
+              serverErrorMsg = data;
+            showErrorAlert(serverErrorMsg);
+            if (isFunc(failCb)) return failCb(data);
+          });
+        if (isFunc(showSpinner)) showSpinner();
+      }
+
+      utils.isFunction = isFunc;
+
+      utils.getJson = function (url, data, doneCallback, failCallback) {
+        ajaxCall(url, data, "GET", doneCallback, failCallback);
+      };
+
+      utils.postJson = function (url, data, doneCallback, failCallback) {
+        ajaxCall(url, data, "POST", doneCallback, failCallback);
+      };
+
+      window.pri = utils;
+    </script>
+
+    <!-- dummy -->
+    <style>
+      .tooltip {
+        display: inline-block;
+        position: relative;
+        border-bottom: 1px dotted #666;
+        text-align: left;
+      }
+
+      .tooltip h3 {
+        margin: 12px 0;
+      }
+
+      .tooltip .top {
+        min-width: 200px;
+        min-height: 70px;
+        top: -20px;
+        left: 50%;
+        transform: translate(-30%, -100%);
+        padding: 10px 20px;
+        color: #ffffff;
+        background-color: #009cdc;
+        font-weight: normal;
+        font-size: 14px;
+        border-radius: 8px;
+        position: absolute;
+        z-index: 99999999;
+        box-sizing: border-box;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+        display: none;
+      }
+
+      .tooltip:hover .top {
+        display: block;
+      }
+
+      .tooltip .bottom {
+        min-width: 200px;
+        min-height: 70px;
+        top: 40px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        padding: 5px;
+        color: white;
+        font-size: 13px;
+        border-radius: 8px;
+        position: absolute;
+        z-index: 9999999;
+        box-sizing: border-box;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+        display: none;
+      }
+
+      .tooltip:hover .bottom {
+        display: block;
+      }
+
+      .tooltip .right {
+        min-width: 200px;
+        min-height: 70px;
+        top: 50%;
+        left: 100%;
+        margin-left: 20px;
+        transform: translate(0, -50%);
+        padding: 5px;
+        color: white;
+        font-weight: normal;
+        font-size: 13px;
+        border-radius: 8px;
+        position: absolute;
+        z-index: 99999999;
+        box-sizing: border-box;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.8s;
+      }
+
+      .tooltip:hover .right {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .tooltip .left {
+        min-width: 200px;
+        min-height: 70px;
+        top: 50%;
+        right: 100%;
+        margin-right: 20px;
+        transform: translate(0, -50%);
+        padding: 5px;
+        color: white;
+        font-weight: normal;
+        font-size: 13px;
+        border-radius: 8px;
+        position: absolute;
+        z-index: 1;
+        box-sizing: border-box;
+        display: none;
+        border: 1px solid #dca;
+      }
+
+      .tooltip:hover .left {
+        display: block;
+      }
+    </style>
+
+    <title>PRCC</title>
+  </head>
+  <body style="margin: 0">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+
+    <!-- <div class="tooltip">Hover over me
+        <span class="tooltiptext">Tooltip text</span>
+      </div> -->
+
+    <!-- JS to add field Hints -->
+    <script>
+      var prhint_fieldHintData = [],
+        fieldHint_App = "prcc";
+      var prhint_fieldHintActive = false;
+      var pagePath = window.location.hash;
+      pagePath = pagePath.substring(1);
+      if (pagePath == "") pagePath = "/";
+      var utilsUrl = "https://QA-IND-prutils.systempr.com/";
+      var fieldHint_getUrl = utilsUrl + "FieldHint/GetPublishedFieldHintData";
+
+
+
+
+
+      function Info() {
+        if (prhint_fieldHintActive) {
+          prhint_fieldHintActive = false;
+          return prhint_removeFieldHint();
+        }
+
+        var app = fieldHint_App;
+        pri.getJson(fieldHint_getUrl, { app, pagePath }, function (res) {
+          if (res.Success) {
+            prhint_fieldHintData = res.Data;
+            console.log(res.Data);
+            prhint_fieldHintActive = true;
+            prhint_showFieldHint();
+          }
+        });
+      }
+
+     
+      // this will get the field hint data from api and show them or remove them if already showing
+
+      //this will find and set field hint data to particular type of html tag
+      function prhint_setHintToElement(tag) {
+        for (var i = 0; i < prhint_fieldHintData.length; i++) {
+          var hint = prhint_fieldHintData[i];
+          if (hint.elementFound == true) continue;
+
+          var elm = $(tag).filter(function () {
+            return $(this).text().trim() === hint.FieldKey;
+          });
+
+          if (elm.length == 0) continue;
+
+          elm.addClass("fieldHint tooltip");
+          elm.attr("data-idx", i.toString());
+          elm.attr("data-href", elm.attr("href"));
+          elm.attr("href", "#");
+          console.log(elm.attr("data-href"));
+          console.log(hint);
+          if (!hint.Position) hint.Position = "bottom";
+
+          var s = i.toString();
+          $("[data-idx=" + s + "]").append(
+            "<div class=" +
+              hint.Position +
+              " style='width:" +
+              hint.Width +
+              "px;height:" +
+              hint.Height +
+              "px;background-color:" +
+              hint.Background +
+              "';>" +
+              hint.Message +
+              "</div>"
+          );
+          hint.elementFound = true;
+        }
+      }
+
+      // this will remove all the field hint data from the elements
+      function prhint_removeFieldHint() {
+        var elem = $(".fieldHint");
+        // $("[data-idx=" + s + "]").remove(
+        //     $(
+        //       "<div class='tooltip'><span style='background:"+bg +";'class='tooltiptext'>" +
+        //         hint.Message +
+        //         "</span></div>"
+        //     )
+        //   );
+        elem.removeAttr("data-idx");
+        // elem.removeAttr("data-original-title");
+        // elem.removeAttr("data-html");
+        // elem.removeAttr("data-placement");
+        // elem.removeAttr("data-template");
+        elem.removeClass("tooltip");
+        elem.removeClass("fieldHint");
+        elem.attr("href", elem.attr("data-href"));
+        $(".tooltip").remove();
+        $(".bottom").remove();
+        $(".top").remove();
+        $(".left").remove();
+        $(".right").remove();
+      }
+
+      // this will show hint on all the required fields
+      function prhint_showFieldHint() {
+        var tags = [
+          "button",
+          "a",
+          "b",
+          "strong",
+          "span",
+          "label",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "th",
+          "p",
+          "td",
+          "div",
+        ];
+        if (prhint_fieldHintActive) tags.map((x) => prhint_setHintToElement(x));
+      }
+    
+      // $(document).ready(function () {
+      //   $("#fieldHintToggle").click(function () {
+      //     console.log("added field onclick")
+      //     Info();
+      //   });
+      // });
+
+      $(window).on('load', function() {
+        console.log("added field onclick")
+        $("#fieldHintToggle").click(function () {
+          console.log("added field onclick")
+          Info();
+        });
+      });
+    </script>
+
+    
+  </body>
+</html>
